@@ -10,6 +10,14 @@
                 <el-table :data="otherTasks" style="width: 100%">
                     <el-table-column label="Список битр" colspan="3" align="center">
                         <el-table-column prop="task" label="Задача"></el-table-column>
+                        <el-table-column prop="status" label="Статус"></el-table-column>
+                        <el-table-column prop="description" label="Описание"></el-table-column>
+                        <el-table-column prop="deadline" label="Срок" width="150">
+                            <template v-slot="scope">
+                                <el-date-picker v-model="scope.row.deadline" type="date" placeholder="Выберите дату"></el-date-picker>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="assignedUser" label="Ответственный"></el-table-column>
                         <el-table-column label="Редактировать" width="130" align="center">
                             <template v-slot="scope">
                                 <div class="button-container">
@@ -61,18 +69,52 @@ export default {
             const taskTitle = prompt('Введите название задачи');
             if (taskTitle) {
                 const taskId = Date.now();
-                this.addTask({ id: taskId, task: taskTitle, fromOtherInstance: true, relatedId: taskId + 1 });
-                this.addTask({ id: taskId + 1, task: taskTitle + " (Чужая)", fromOtherInstance: false, relatedId: taskId });
+                this.addTask({
+                    id: taskId,
+                    task: taskTitle,
+                    status: 'новая',
+                    description: 'Описание задачи',
+                    deadline: new Date(),
+                    assignedUser: 'Иван Иванов',
+                    fromOtherInstance: false,
+                    relatedId: taskId + 1
+                });
+                this.addTask({
+                    id: taskId + 1,
+                    task: taskTitle + " (Чужая)",
+                    status: 'новая',
+                    description: 'Описание задачи (Чужая)',
+                    deadline: new Date(),
+                    assignedUser: 'Петр Петров',
+                    fromOtherInstance: true,
+                    relatedId: taskId
+                });
             }
         },
         editMyTask(task) {
             const updatedTitle = prompt('Введите новое название задачи', task.task);
             if (updatedTitle) {
-                this.editTask({ id: task.id, updatedTask: { task: updatedTitle } });
+                this.editTask({
+                    id: task.id,
+                    updatedTask: {
+                        task: updatedTitle,
+                        description: 'Обновленное описание',
+                        deadline: new Date(),
+                        assignedUser: 'Обновленный пользователь'
+                    }
+                });
 
-                const relatedTask = this.myTasks.find(t => t.relatedId === task.id);
+                const relatedTask = this.otherTasks.find(t => t.relatedId === task.id);
                 if (relatedTask) {
-                    this.editTask({ id: relatedTask.id, updatedTask: { task: updatedTitle + " (Чужая)" } });
+                    this.editTask({
+                        id: relatedTask.id,
+                        updatedTask: {
+                            task: updatedTitle + " (Чужая)",
+                            description: 'Обновленное описание (Чужая)',
+                            deadline: new Date(),
+                            assignedUser: 'Обновленный пользователь (Чужая)'
+                        }
+                    });
                 }
             }
         },

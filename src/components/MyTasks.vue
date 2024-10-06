@@ -10,6 +10,32 @@
                 <el-table :data="myTasks" style="width: 100%">
                     <el-table-column label="Список битр" colspan="3" align="center">
                         <el-table-column prop="task" label="Задача"></el-table-column>
+                        <el-table-column prop="status" label="Статус"></el-table-column>
+                        <el-table-column prop="description" label="Описание"></el-table-column>
+                        <el-table-column prop="deadline" label="Срок" width="60">
+                            <template v-slot="scope">
+                                <div class="icon-container">
+                                    <el-popover
+                                        placement="bottom"
+                                        trigger="click"
+                                        v-model:visible="visiblePopover[scope.$index]"
+                                    >
+                                        <el-date-picker
+                                            v-model="scope.row.deadline"
+                                            type="date"
+                                            placeholder="Выберите дату"
+                                            style="width: 100%"
+                                        />
+                                        <template #reference>
+                                            <el-icon>
+                                                <Calendar />
+                                            </el-icon>
+                                        </template>
+                                    </el-popover>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="assignedUser" label="Ответственный"></el-table-column>
                         <el-table-column label="Редактировать" width="130" align="center">
                             <template v-slot="scope">
                                 <div class="button-container">
@@ -38,9 +64,12 @@ import { ElButton, ElTable, ElTableColumn } from 'element-plus';
 import DeleteIcon from '../items/DeleteIcon.vue';
 import EditIcon from '../items/EditIcon.vue';
 import BackIcon from '../items/BackIcon.vue';
+import { Calendar } from '@element-plus/icons-vue';
+import { ref } from 'vue';
 
 export default {
     components: {
+        Calendar,
         BackIcon,
         EditIcon,
         DeleteIcon,
@@ -50,7 +79,13 @@ export default {
     },
     setup() {
         const router = useRouter();
-        return { router };
+        const visiblePopover = ref({});
+        return {
+            visiblePopover,
+            router
+        }
+
+
     },
     computed: {
         ...mapGetters(['myTasks', 'otherTasks'])
@@ -61,18 +96,52 @@ export default {
             const taskTitle = prompt('Введите название задачи');
             if (taskTitle) {
                 const taskId = Date.now();
-                this.addTask({ id: taskId, task: taskTitle, fromOtherInstance: false, relatedId: taskId + 1 });
-                this.addTask({ id: taskId + 1, task: taskTitle + " (Чужая)", fromOtherInstance: true, relatedId: taskId });
+                this.addTask({
+                    id: taskId,
+                    task: taskTitle,
+                    status: 'новая',
+                    description: 'Описание задачи',
+                    deadline: new Date(),
+                    assignedUser: 'Иван Иванов',
+                    fromOtherInstance: false,
+                    relatedId: taskId + 1
+                });
+                this.addTask({
+                    id: taskId + 1,
+                    task: taskTitle + " (Чужая)",
+                    status: 'новая',
+                    description: 'Описание задачи (Чужая)',
+                    deadline: new Date(),
+                    assignedUser: 'Петр Петров',
+                    fromOtherInstance: true,
+                    relatedId: taskId
+                });
             }
         },
         editMyTask(task) {
             const updatedTitle = prompt('Введите новое название задачи', task.task);
             if (updatedTitle) {
-                this.editTask({ id: task.id, updatedTask: { task: updatedTitle } });
+                this.editTask({
+                    id: task.id,
+                    updatedTask: {
+                        task: updatedTitle,
+                        description: 'Обновленное описание',
+                        deadline: new Date(),
+                        assignedUser: 'Обновленный пользователь'
+                    }
+                });
 
                 const relatedTask = this.otherTasks.find(t => t.relatedId === task.id);
                 if (relatedTask) {
-                    this.editTask({ id: relatedTask.id, updatedTask: { task: updatedTitle + " (Чужая)" } });
+                    this.editTask({
+                        id: relatedTask.id,
+                        updatedTask: {
+                            task: updatedTitle + " (Чужая)",
+                            description: 'Обновленное описание (Чужая)',
+                            deadline: new Date(),
+                            assignedUser: 'Обновленный пользователь (Чужая)'
+                        }
+                    });
                 }
             }
         },
@@ -110,4 +179,10 @@ header
 .button-container
   display: flex
   justify-content: center
+
+.icon-container
+  display: flex
+  justify-content: center
+  align-items: center
+  height: 100%
 </style>

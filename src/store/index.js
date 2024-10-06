@@ -15,6 +15,13 @@ export default createStore({
     },
     mutations: {
         ADD_TASK(state, task) {
+            const defaultFields = {
+                status: 'новая',
+                description: '',
+                deadline: null,
+                assignedUser: null
+            };
+
             state.tasks.push(task);
             saveTasksToLocalStorage(state.tasks);
         },
