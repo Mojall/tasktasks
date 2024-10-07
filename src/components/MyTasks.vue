@@ -9,33 +9,8 @@
                 <button @click="addNewTask('mine')">Добавить</button>
                 <el-table :data="myTasks" style="width: 100%">
                     <el-table-column label="Список битр" colspan="3" align="center">
-                        <el-table-column prop="task" label="Задача"></el-table-column>
-                        <el-table-column prop="status" label="Статус"></el-table-column>
-                        <el-table-column prop="description" label="Описание"></el-table-column>
-                        <el-table-column prop="deadline" label="Срок" width="60">
-                            <template v-slot="scope">
-                                <div class="icon-container">
-                                    <el-popover
-                                        placement="bottom"
-                                        trigger="click"
-                                        v-model:visible="visiblePopover[scope.$index]"
-                                    >
-                                        <el-date-picker
-                                            v-model="scope.row.deadline"
-                                            type="date"
-                                            placeholder="Выберите дату"
-                                            style="width: 100%"
-                                        />
-                                        <template #reference>
-                                            <el-icon>
-                                                <Calendar />
-                                            </el-icon>
-                                        </template>
-                                    </el-popover>
-                                </div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="assignedUser" label="Ответственный"></el-table-column>
+                        <el-table-column prop="task" label="Название сайта"></el-table-column>
+                        <el-table-column prop="status" label="Ссылка на CRM"></el-table-column>
                         <el-table-column label="Редактировать" width="130" align="center">
                             <template v-slot="scope">
                                 <div class="button-container">
@@ -99,20 +74,14 @@ export default {
                 this.addTask({
                     id: taskId,
                     task: taskTitle,
-                    status: 'новая',
-                    description: 'Описание задачи',
-                    deadline: new Date(),
-                    assignedUser: 'Иван Иванов',
+                    status: 'https://.......',
                     fromOtherInstance: false,
                     relatedId: taskId + 1
                 });
                 this.addTask({
                     id: taskId + 1,
                     task: taskTitle + " (Чужая)",
-                    status: 'новая',
-                    description: 'Описание задачи (Чужая)',
-                    deadline: new Date(),
-                    assignedUser: 'Петр Петров',
+                    status: 'https://.......',
                     fromOtherInstance: true,
                     relatedId: taskId
                 });
@@ -125,9 +94,6 @@ export default {
                     id: task.id,
                     updatedTask: {
                         task: updatedTitle,
-                        description: 'Обновленное описание',
-                        deadline: new Date(),
-                        assignedUser: 'Обновленный пользователь'
                     }
                 });
 
@@ -137,9 +103,6 @@ export default {
                         id: relatedTask.id,
                         updatedTask: {
                             task: updatedTitle + " (Чужая)",
-                            description: 'Обновленное описание (Чужая)',
-                            deadline: new Date(),
-                            assignedUser: 'Обновленный пользователь (Чужая)'
                         }
                     });
                 }
